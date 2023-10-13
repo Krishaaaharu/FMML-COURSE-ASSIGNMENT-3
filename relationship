@@ -1,0 +1,75 @@
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Person {
+    String firstname;
+    String familyname;
+    String birthfamilyname;
+    String gender;
+    String fathername;
+    String spousename;
+    int age;
+
+    public Person(String firstname, String familyname, String birthfamilyname, String gender, String fathername, String spousename, int age) {
+        this.firstname = firstname;
+        this.familyname = familyname;
+        this.birthfamilyname = birthfamilyname;
+        this.gender = gender;
+        this.fathername = fathername;
+        this.spousename = spousename;
+        this.age = age;
+    }
+}
+
+public class WesterosKingdom {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        int N = scanner.nextInt();
+        scanner.nextLine();
+
+        Map<String, Person> people = new HashMap<>();
+        Map<String, Set<String>> clusters = new HashMap<>();
+
+        for (int i = 0; i < N; i++) {
+            String[] data = scanner.nextLine().split(" ");
+            String firstname = data[0];
+            String familyname = data[1];
+            String birthfamilyname = data[2];
+            String gender = data[3];
+            String fathername = data[4];
+            String spousename = data[5];
+            int age = Integer.parseInt(data[6]);
+            people.put(firstname, new Person(firstname, familyname, birthfamilyname, gender, fathername, spousename, age));
+            clusters.computeIfAbsent(familyname, k -> new HashSet<>()).add(firstname);
+        }
+
+        int E = scanner.nextInt();
+        scanner.nextLine();
+
+        for (int i = 0; i < E; i++) {
+            String event = scanner.nextLine();
+            String[] eventDetails = event.split(" ");
+
+            if (eventDetails[0].equals("MA")) {
+                // Marriage event
+                String person1 = eventDetails[1];
+                String person2 = eventDetails[2];
+                people.get(person1).spousename = people.get(person2).firstname;
+                people.get(person2).spousename = people.get(person1).firstname;
+
+                // Merge family clusters
+                String family1 = people.get(person1).familyname;
+                String family2 = people.get(person2).familyname;
+                clusters.get(family1).addAll(clusters.get(family2));
+                clusters.get(family2).addAll(clusters.get(family1));
+            }
+
+            // Implement handling for other event types (DI, BI, DE, YP)
+        }
+
+        // Handle queries (PA and PO) here
+
+        scanner.close();
+    }
+}
